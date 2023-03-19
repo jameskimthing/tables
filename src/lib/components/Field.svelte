@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 
 	export let is: string;
-	export let info: { [key: string]: string };
+	export let info: any;
 
 	const isPassword = is === 'password';
 	const type: string = isPassword ? is : 'text';

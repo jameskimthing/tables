@@ -3,7 +3,7 @@
 	import '../app.css';
 </script>
 
-<div class="bg-background h-screen w-screen">
+<div class="">
 	<slot />
 </div>
 

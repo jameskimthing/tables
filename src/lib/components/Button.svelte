@@ -2,6 +2,7 @@
 	// export let text: string;
 	export let click: () => any = () => {};
 	export let isLoading: boolean = false;
+	export let name: string = 'submit';
 
 	let button: HTMLDivElement;
 	$: (() => {
@@ -12,7 +13,6 @@
 	})();
 </script>
 
-<!-- class="bg-slate-600 text-white rounded hover:bg-slate-500 px-2 pb-1.5 pt-1 max-w-fit" -->
 <div
 	class="border-2 border-black rounded-sm hover:bg-gray-300 px-2 max-w-fit"
 	bind:this={button}
@@ -39,6 +39,6 @@
 			</svg>
 			<div class="w-2" />
 		{/if}
-		Submit
+		{name}
 	</button>
 </div>
