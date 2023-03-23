@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { alertUser } from '$lib/auth/alert';
+	import { alertUser } from '$lib/components/components/alert';
 	import { signin } from '$lib/auth/authentication';
-	import Button from '$lib/components/Button.svelte';
-	import Field from '$lib/components/Field.svelte';
+	import Button from '$lib/components/form/Button.svelte';
+	import Field from '$lib/components/form/Field.svelte';
 	export let info: { email: string; password: string };
 
 	let isLoading: boolean = false;
@@ -18,9 +18,9 @@
 	}
 </script>
 
-<form on:submit|preventDefault={submit} class="flex flex-col items-end">
+<form class="flex flex-col items-end">
 	<Field is="email" {info} />
 	<Field is="password" {info} />
 	<div class="h-2" />
-	<Button {isLoading} />
+	<Button {submit} />
 </form>

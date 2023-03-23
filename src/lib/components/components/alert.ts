@@ -49,6 +49,7 @@ function alertUser(type: alertType, title: string, body: string) {
 			return prevAlerts;
 		});
 	})();
+	console.log('?here');
 }
 
 export { alerts, alertUser };

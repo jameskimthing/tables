@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { alerts } from '$lib/auth/alert';
+	import { alerts } from '$lib/components/components/alert';
 	import { fly } from 'svelte/transition';
 </script>
 
-<div class="absolute top-5 left-5">
+<div class="fixed top-5 left-5 z-50">
 	{#each Object.entries($alerts) as [key, info] (key)}
 		<div in:fly={{ x: -200, duration: 200 }} out:fly={{ x: -200, duration: 400 }} class="pb-4">
 			<div class={'border-t-4 ' + info['color']}>

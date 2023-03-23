@@ -1,9 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import Button from '$lib/components/Button.svelte';
+	import TagChipsList from '$lib/components/chips/TagChipsList.svelte';
+	import Button from '$lib/components/form/Button.svelte';
+	import SvgButton from '$lib/components/SvgButton.svelte';
+	import { addSingleFolder } from '$lib/tables/folders';
 	import { tablesStore } from '$lib/tables/stores';
 	import { loadSingleTable, loadTableOverviews } from '$lib/tables/tables';
+	import { addSingleTag } from '$lib/tables/tags';
+	import SingleFolderView from './SingleFolderView.svelte';
 
 	const table_id = $page.url.searchParams.get('id');
 	if (!table_id) throw 'NO ID?';
@@ -12,40 +17,42 @@
 
 	(async () => {
 		isLoading = true;
+		console.log('Loading start!');
 		if (!$tablesStore[table_id]) await loadTableOverviews();
 
 		const folders = $tablesStore[table_id]['folders'];
-		if (Object.keys(folders).length === 0) return;
 
-		if (!folders[Object.keys(folders)[0]]['mods']) await loadSingleTable(table_id);
+		const firstFolderId: string = Object.keys($tablesStore[table_id]['folders'])[0];
+		const notLoadedYet: boolean = !!$tablesStore[table_id]['folders'][firstFolderId]['mods'];
+		const foldersExist: boolean = Object.keys(folders).length !== 0;
+		if (foldersExist && notLoadedYet) await loadSingleTable(table_id);
+
 		isLoading = false;
 	})();
 </script>
 
-<Button click={() => goto('/home')} name="Go back" />
+<Button submit={() => goto('/home')} name="Go back" />
+<Button submit={() => addSingleTag(table_id)} name="Add a tag" />
+
+<div class="flex flex-row py-2">
+	<SvgButton type="tag" is="Tags within this table" />
+	{#if !isLoading}
+		<TagChipsList {table_id} />
+	{/if}
+</div>
+
+<div class="pt-2">
+	<div
+		class="flex flex-row items-center cursor-pointer px-2 py-1 border-2 border-transparent rounded w-fit hover:border-black hover:bg-gray-300"
+		on:pointerup={() => addSingleFolder(table_id)}
+	>
+		<SvgButton type="plus" is="Add a item to this folder" />
+		<div class="text-3xl px-2 pb-1">Add a new folder?</div>
+	</div>
+</div>
 
 {#if !isLoading}
-	{#each Object.entries($tablesStore[table_id]['folders']) as [folder_id, folder]}
-		<div class="p-2 mx-4 my-2 border-4 border-black rounded">
-			<div class="text-2xl">{folder['name']}</div>
-			<div class="text-gray-700 border-b-2 border-black">
-				{folder['description']}
-			</div>
-			{#if folder['mods']}
-				{#each Object.entries(folder['mods']) as [mod_id, mod]}
-					<div class="h-6" />
-					<div class="text-xl">{mod.name ?? ''}</div>
-					<div class="italic text-gray-700">{mod.description ?? ''}</div>
-					<div>Additional Info: {mod.additional_info ?? ''}</div>
-					<div>Link: {mod.link ?? ''}</div>
-					<div>Completed: {mod.completed ?? ''}</div>
-					{#if mod.tags}
-						{#each mod.tags as tag}
-							<div>Tags: {JSON.stringify($tablesStore[table_id]['tags'][tag])}</div>
-						{/each}
-					{/if}
-				{/each}
-			{/if}
-		</div>
+	{#each Object.entries($tablesStore[table_id]['folders']) as [folder_id, folder] (folder_id)}
+		<SingleFolderView {table_id} {folder_id} />
 	{/each}
 {/if}

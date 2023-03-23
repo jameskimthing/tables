@@ -1,8 +1,19 @@
 <script lang="ts">
 	// export let text: string;
-	export let click: () => any = () => {};
-	export let isLoading: boolean = false;
+	// export let isLoading: boolean = false;
+	export let submit: Function = () => {};
 	export let name: string = 'submit';
+	export let darkTheme: boolean = false;
+	export let dontSubmit: boolean = false;
+	export let isDangerous: boolean = false;
+
+	const borderTheme = isDangerous
+		? ' border-red-600'
+		: darkTheme
+		? ' border-slate-700'
+		: ' border-black';
+
+	const theme = darkTheme ? ' bg-slate-700 hover:bg-slate-500 text-white' : ' hover:bg-gray-300';
 
 	let button: HTMLDivElement;
 	$: (() => {
@@ -11,21 +22,31 @@
 			else button.style.pointerEvents = 'auto';
 		}
 	})();
+
+	let isLoading: boolean = false;
+	async function submitButton() {
+		isLoading = true;
+		await submit();
+		isLoading = false;
+	}
 </script>
 
-<div
-	class="border-2 border-black rounded-sm hover:bg-gray-300 px-2 max-w-fit"
-	bind:this={button}
-	style={isLoading ? 'background-color: rgb(209 213 219)' : ''}
+<!-- class="flex flex-row justify-center items-center" -->
+<button
+	id="button"
+	type={dontSubmit ? 'button' : 'submit'}
+	on:pointerup={submitButton}
+	disabled={isLoading}
 >
-	<button
-		type="submit"
-		class="flex flex-row justify-center items-center"
-		on:pointerup={click}
-		disabled={isLoading}
+	<div
+		class={'border-2 rounded px-2 max-w-fit flex flex-row justify-center items-center' +
+			theme +
+			borderTheme}
+		bind:this={button}
+		style={isLoading ? 'background-color: rgb(209 213 219)' : ''}
 	>
 		{#if isLoading}
-			<svg class="animate-spin" width={16} height={16} viewBox="0 0 100 101">
+			<svg class="animate-spin" width={13} height={13} viewBox="0 0 100 100">
 				<svg class="text-slate-500 fill-gray-200">
 					<path
 						d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
@@ -40,5 +61,5 @@
 			<div class="w-2" />
 		{/if}
 		{name}
-	</button>
-</div>
+	</div>
+</button>

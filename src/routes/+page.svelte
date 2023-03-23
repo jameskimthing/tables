@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { supabase, user } from '$lib/supabase';
+	import { supabase } from '$lib/supabase';
 
 	// if ($user) goto('/home');
 	// else goto('/auth');
