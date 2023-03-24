@@ -21,8 +21,6 @@
 		previewText = info[is].toLowerCase().replaceAll(' ', '-');
 	};
 
-	console.log(info[is]);
-
 	function setPreview() {
 		isFocus = false;
 		if (!isTag) return;
@@ -41,29 +39,49 @@
 	}
 
 	let isFocus: boolean = false;
+
+	const isLong: boolean = is === 'description' || is === 'additional_info';
 </script>
 
-<div class="flex flex-row justify-between pt-1 pr-1 relative">
-	{placeholder + ': '}
+<div class="flex flex-row justify-between pt-1 pr-1 relative items-center">
+	<div class="pr-4">
+		{placeholder + ':'}
+	</div>
+
 	<div>
 		{#if isTag && previewText !== '' && isFocus}
 			<div class="z-10 border-2 border-black bg-white px-2 rounded shadow absolute -mt-8">
 				{previewText}
 			</div>
 		{/if}
-		<input
-			id={is}
-			{type}
-			{placeholder}
-			{autofocus}
-			on:input={handleInput}
-			on:keydown={onKeydown}
-			on:blur={setPreview}
-			on:focus={() => (isFocus = true)}
-			value={info[is] ?? ''}
-			class="rounded pl-1 focus:outline-none"
-			required
-		/>
+		{#if isLong}
+			<textarea
+				id={is}
+				{placeholder}
+				{autofocus}
+				on:input={handleInput}
+				on:keydown={onKeydown}
+				on:blur={setPreview}
+				on:focus={() => (isFocus = true)}
+				value={info[is] ?? ''}
+				class="rounded pl-1 focus:outline-none"
+				required
+			/>
+		{:else}
+			<input
+				id={is}
+				{type}
+				{placeholder}
+				{autofocus}
+				on:input={handleInput}
+				on:keydown={onKeydown}
+				on:blur={setPreview}
+				on:focus={() => (isFocus = true)}
+				value={info[is] ?? ''}
+				class="rounded pl-1 focus:outline-none"
+				required
+			/>
+		{/if}
 	</div>
 	{#if isPassword}
 		<div

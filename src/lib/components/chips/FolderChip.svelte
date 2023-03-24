@@ -12,7 +12,7 @@
 </script>
 
 <div
-	class="rounded bg-gray-300 group text-sm py-0.5 px-1 font-bold mx-1 cursor-pointer"
+	class="rounded bg-gray-300 group text-sm py-0.5 px-2 font-bold mx-1 cursor-pointer"
 	on:pointerup={() => editSingleFolder(folder_id, table_id)}
 >
 	{folder['name']}

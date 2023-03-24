@@ -285,6 +285,7 @@ async function loadTableOverviews() {
 }
 
 async function loadSingleTable(table_id: string) {
+	console.log('--------------------------------------------------------------------------------');
 	console.log('Loading table: ' + table_id);
 	const folders = get(tablesStore)[table_id]['folders'];
 
@@ -316,16 +317,29 @@ async function loadSingleTable(table_id: string) {
 		})();
 	}
 
+	const foldersLength = Object.keys(folders).length;
+	while (foldersDone !== foldersLength) {
+		await new Promise((res) => setTimeout(res, 50));
+	}
+	console.log('Loaded mods (folders): ');
+	console.log(get(tablesStore)[table_id]['folders']);
+
 	// Get the tags for each mod
 	const tags = Object.keys(get(tablesStore)[table_id]['tags']);
+	console.log('Tags in this table: ' + JSON.stringify(tags));
 	for (const tag_id of tags) {
 		(async () => {
 			const tagMods = await supabase.from('Mod Tags').select('mod_id').eq('tag_id', tag_id);
 			if (tagMods['error']) throw tagMods['error'];
 
 			// const tags: { [key: string]: SingleTag } = {};
+			console.log('  tagmods');
+			const modsToAssignTagsTo = tagMods['data'].map(({ mod_id }) => mod_id as string);
+			console.log(
+				'  current tag: ' + tag_id + ' - ' + JSON.stringify(get(tablesStore)[table_id]['tags'])
+			);
+			console.log('  mods on this tag: ' + JSON.stringify(modsToAssignTagsTo));
 
-			const modsToAssignTagsTo = tagMods['data'].map((tag) => tag['mod_id'] as string);
 			for (const mod_id of modsToAssignTagsTo) {
 				for (const folder_id of Object.keys(folders)) {
 					if (!folders[folder_id]['mods']) continue;
@@ -333,7 +347,7 @@ async function loadSingleTable(table_id: string) {
 
 					// folders[folder_id]['mods']![mod_id]['tags']?.push(tag_id);
 					tablesStore.update((table) => {
-						table[table_id]['folders'][folder_id]['mods']![mod_id]['tags']?.push(tag_id);
+						table[table_id]['folders'][folder_id]['mods']![mod_id]['tags'].push(tag_id);
 						return table;
 					});
 				}
@@ -353,12 +367,15 @@ async function loadSingleTable(table_id: string) {
 	}
 
 	// const l = tableOverviewsData['data'].length;
-	const foldersLength = Object.keys(folders).length;
+	// const foldersLength = Object.keys(folders).length;
 	const tagsLength = tags.length;
 
-	while (foldersDone !== foldersLength || tagsDone !== tagsLength) {
-		await new Promise((res) => setTimeout(res, 100));
+	while (tagsDone !== tagsLength) {
+		await new Promise((res) => setTimeout(res, 50));
 	}
+
+	console.log('Loaded tags: ');
+	console.log(get(tablesStore)[table_id]['folders']);
 
 	// Update
 	// tablesStore.update((prevTableStore) => {

@@ -156,9 +156,14 @@ async function editSingleMod(mod_id: string, folder_id: string, table_id: string
 			console.log('Pre-existing tags: ' + JSON.stringify(preExistingTags));
 			console.log('Tags to delete: ' + JSON.stringify(tagsToDelete));
 			console.log('Tags to add: ' + JSON.stringify(tagsToAdd));
+
 			for (const tag_id of tagsToDelete) {
 				(async () => {
-					const tagDeleted = await supabase.from('Mod Tags').delete().eq('tag_id', tag_id);
+					const tagDeleted = await supabase
+						.from('Mod Tags')
+						.delete()
+						.eq('tag_id', tag_id)
+						.eq('mod_id', mod_id);
 					if (tagDeleted['error']) throw tagDeleted['error'];
 				})();
 			}
@@ -187,11 +192,17 @@ async function editSingleMod(mod_id: string, folder_id: string, table_id: string
 					...fields,
 					completed: booleanFields[0]['checked'],
 					created_at: modsData['data'][0]['created_at'],
-					tags: choiceFields[0]['choices']
+					tags: tagsSelected
 				};
+				console.log('Tags of this mod: ');
+				console.log(table[table_id]['folders'][folder_id]['mods']![mod_id]['tags']);
 
 				return table;
 			});
+		},
+		additionalOption: {
+			name: 'delete item',
+			onSubmit: async () => await deleteSingleMod(mod_id, folder_id, table_id)
 		}
 	});
 }

@@ -15,10 +15,14 @@
 	}
 </script>
 
-<form id="form" class="flex flex-col items-end">
+<form id="form" class="flex flex-col w-fit">
 	<Field is="name" {info} />
 	<Field is="email" {info} />
 	<Field is="password" {info} />
 	<div class="h-2" />
-	<Button {submit} />
+	<div class="w-full">
+		<div class="ml-auto w-fit">
+			<Button {submit} />
+		</div>
+	</div>
 </form>

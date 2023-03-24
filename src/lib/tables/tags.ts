@@ -86,56 +86,64 @@ async function editSingleTag(tag_id: string, table_id: string) {
 		},
 		additionalOption: {
 			name: 'delete tag',
-			onSubmit: async () => {
-				showPopup({
-					title: 'Delete the tag?',
-					body: 'This effect is permanent',
-					nameOfSubmit: 'delete',
-					submitIsDangerous: true,
-					onFieldsSubmit: async () => {
-						const modTagsData = await supabase
-							.from('Mod Tags')
-							.delete()
-							.eq('tag_id', tag_id)
-							.select('mod_id');
-						if (modTagsData['error']) throw modTagsData['error'];
+			onSubmit: async () => await deleteSingleTag(tag_id, table_id)
+		}
+	});
+}
 
-						const tagData = await supabase.from('Tags').delete().eq('id', tag_id);
-						if (tagData['error']) throw tagData['error'];
+async function deleteSingleTag(tag_id: string, table_id: string) {
+	showPopup({
+		title: 'Delete the tag?',
+		body: 'This effect is permanent',
+		nameOfSubmit: 'delete',
+		submitIsDangerous: true,
+		onFieldsSubmit: async () => {
+			const modTagsData = await supabase
+				.from('Mod Tags')
+				.delete()
+				.eq('tag_id', tag_id)
+				.select('mod_id');
+			if (modTagsData['error']) throw modTagsData['error'];
 
-						// const mods = modTagsData[]
-						const mod_ids: string[] = [];
-						for (const mod of modTagsData['data']) {
-							mod_ids.push(mod['mod_id']);
-						}
+			const tagData = await supabase.from('Tags').delete().eq('id', tag_id);
+			if (tagData['error']) throw tagData['error'];
 
-						tablesStore.update((table) => {
-							delete table[table_id]['tags'][tag_id];
+			// const mods = modTagsData[]
+			// const mod_ids: string[] = [];
+			// for (const mod of modTagsData['data']) {
+			// 	mod_ids.push(mod['mod_id']);
+			// }
+			const mod_ids = modTagsData['data'].map(({ mod_id }) => mod_id as string);
 
-							for (const mod_id of mod_ids) {
-								// to the folder that has this certain mod
-								for (const [folder_id, folder] of Object.entries(table[table_id]['folders'])) {
-									if (!folder['mods']) continue;
-									if (!folder['mods'][mod_id]) continue;
-									if (!folder['mods'][mod_id]['tags']) continue;
+			tablesStore.update((table) => {
+				console.log(
+					'----- Deleting tag: ' + table_id + ' - ' + table[table_id]['tags'][tag_id]['name']
+				);
 
-									folder['mods'][mod_id]['tags']?.filter((tag) => tag === tag_id);
-									// folder['mods'][mod_id]['tags']?.filter((tag))
-									// const indexOfMod = folder['mods'][mod_id]['tags']!.indexOf(mod_id);
-									// if (indexOfMod > -1) folder['mods'][mod_id]['tags']!.splice(indexOfMod, 1);
-								}
-							}
+				// Remove the references to that tag to delete
+				for (const mod_id of mod_ids) {
+					for (const [folder_id, folder] of Object.entries(table[table_id]['folders'])) {
+						if (!folder['mods']) continue;
+						if (!folder['mods'][mod_id]) continue;
+						if (!folder['mods'][mod_id]['tags']) continue;
 
-							return table;
-						});
-
-						popup.set([]);
+						// remove all the mods that reference that certain tag
+						folder['mods']![mod_id]['tags'] = folder['mods'][mod_id]['tags']?.filter(
+							(tag) => tag !== tag_id
+						);
+						console.log('Changed mods: ' + JSON.stringify(folder['mods'][mod_id]['tags']));
 					}
-				});
-			}
+				}
+				console.log('Delete tag in table');
+				delete table[table_id]['tags'][tag_id];
+
+				return table;
+			});
+
+			popup.set([]);
 		}
 	});
 }
 
 export { filterThroughTags };
-export { addSingleTag, editSingleTag };
+export { addSingleTag, editSingleTag, deleteSingleTag };

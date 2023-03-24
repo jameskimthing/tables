@@ -6,9 +6,11 @@
 </script>
 
 {#if is}
-	<div class="transition-all scale-y-0 group-hover:scale-y-100">
-		<div class={`absolute top-2 shadow-xl bg-black rounded-md py-1 px-2 ${t}`}>
-			<div class="w-auto min-w-max text-white font-bold text-sm relative">{is}</div>
+	<div class="transition-transform scale-y-0 group-hover:scale-y-100 pointer-events-none">
+		<div class={`absolute top-2 shadow-xl bg-black rounded-md py-1 px-2 z-10 ${t}`}>
+			<div class="w-auto min-w-max text-white font-bold text-sm relative">
+				{is}
+			</div>
 		</div>
 	</div>
 {/if}

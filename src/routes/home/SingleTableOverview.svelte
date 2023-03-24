@@ -2,8 +2,6 @@
 	import { goto } from '$app/navigation';
 	import FolderChip from '$lib/components/chips/FolderChip.svelte';
 	import TagChipsList from '$lib/components/chips/TagChipsList.svelte';
-	// import TagChip from '$lib/components/chips/TagChip.svelte';
-	// import TagChipList from '$lib/components/chips/t.svelte';
 	import SvgButton from '$lib/components/SvgButton.svelte';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 	import { addSingleFolder } from '$lib/tables/folders';
@@ -11,7 +9,6 @@
 	import { deleteSingleTable, editSingleTable } from '$lib/tables/tables';
 	import { addSingleTag } from '$lib/tables/tags';
 
-	// export let table: SingleTable;
 	export let table_id: string;
 	let table: SingleTable;
 	$: table = $tablesStore[table_id];
@@ -24,7 +21,7 @@
 <div class="p-2 border-4 rounded border-black">
 	<div class="pb-2 flex-row flex justify-between">
 		<div
-			class="text-2xl cursor-pointer px-2 border-2 rounded border-transparent hover:border-black hover:bg-gray-200 relative group"
+			class="text-3xl cursor-pointer px-2 border-2 rounded border-transparent hover:border-black hover:bg-gray-200 relative group"
 			on:pointerup={clickedTable}
 		>
 			{table['name']}
@@ -52,7 +49,7 @@
 	</div>
 	<div class="border-t-2 border-black text-gray-700 pb-2">{table.description}</div>
 
-	<div class="flex flex-row">
+	<div class="flex flex-row items-center">
 		<SvgButton
 			type="folder"
 			is="Folders within this table"
@@ -62,7 +59,7 @@
 			<FolderChip {folder_id} {table_id} />
 		{/each}
 	</div>
-	<div class="flex flex-row py-2">
+	<div class="flex flex-row py-2 items-center">
 		<SvgButton type="tag" is="Tags within this table" click={() => addSingleTag(table_id)} />
 		<TagChipsList {table_id} />
 	</div>

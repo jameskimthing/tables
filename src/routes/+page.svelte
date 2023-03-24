@@ -1,16 +1,17 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { supabase } from '$lib/supabase';
+	import { getUser } from '$lib/supabase';
 
-	// if ($user) goto('/home');
-	// else goto('/auth');
-
-	// // (async () => {
-
-	// // 	const user = await supabase.auth.getUser();
-	// // 	if (user) goto('/home');
-	// // 	else goto('/auth');
-	// // })();
+	(async () => {
+		// try {
+		const user = await getUser();
+		if (user) goto('/home');
+		else goto('/auth');
+		// } catch (err) {
+		// console.log(JSON.stringify(err));
+		// goto('/auth');
+		// }
+	})();
 </script>
 
 <div class="text-center text-5xl pt-14">Loading...</div>

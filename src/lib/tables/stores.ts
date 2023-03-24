@@ -15,7 +15,8 @@ interface SingleMod {
 	link: string;
 	completed: boolean;
 	created_at: Date;
-	tags?: string[];
+	// tags?: string[];
+	tags: string[];
 }
 
 interface SingleFolder {

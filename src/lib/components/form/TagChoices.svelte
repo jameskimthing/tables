@@ -31,11 +31,20 @@
 
 	let selectedTags: { [key: string]: SingleTag } = {};
 
-	if (choiceField['choices']) {
-		for (const tag_id of choiceField['choices']) {
-			selectedTags[tag_id] = $tablesStore[table_id]['tags'][tag_id];
+	$: getSelectedTags($tablesStore[table_id]['tags']), refreshItems();
+	function getSelectedTags(tags: { [key: string]: SingleTag }) {
+		// selectedTags
+		for (const tag_id of choiceField['choices'] ?? []) {
+			// If such tag does not exist, remove that tag from the options
+			if (!tags[tag_id]) {
+				choiceField['choices'] = choiceField['choices']?.filter((tag) => tag === tag_id);
+				delete selectedTags[tag_id];
+			} else {
+				selectedTags[tag_id] = tags[tag_id];
+			}
 		}
 	}
+	// getSelectedTags();
 
 	type itemsList = string[];
 
@@ -115,20 +124,22 @@
 		</div>
 		{#each Object.entries(selectedTags) as [tag_id, tag] (tag_id)}
 			<div class="p-1">
-				<div class="flex flex-row w-fit">
-					<TagChip {tag_id} {table_id} />
+				<div class="flex flex-row w-fit items-center">
 					<div
-						class="w-5 h-5 text-center align-middle rounded border-2 cursor-pointer hover:border-black hover:bg-gray-400 select-none"
+						class="scale-90 px-1 rounded border-2 cursor-pointer hover:border-black hover:bg-gray-400 select-none"
 						on:pointerup={() => {
 							// const clone = JSON.parse(JSON.stringify(selectedTags))
 							const clone = selectedTags;
 							delete clone[tag_id];
 							selectedTags = clone;
+							choiceField['choices'] = Object.keys(selectedTags);
 							refreshItems();
 						}}
 					>
-						x
+						<!-- ✖ -->
+						✕
 					</div>
+					<TagChip {tag_id} {table_id} />
 				</div>
 			</div>
 		{/each}
@@ -156,10 +167,10 @@
 			</div>
 		{/if}
 		{#if showChoices}
-			<div class="z-10 rounded absolute mt-8 backdrop-blur-sm">
+			<div class="z-10 rounded absolute mt-8">
 				<div class="flex flex-col">
 					{#each Object.entries(chosenTags) as [tag_id, tag]}
-						<div class="pb-1">
+						<div class="pb-1 pointer-events-none">
 							{#if currentItemId === tag_id}
 								<div class="border-2 border-black rounded w-fit">
 									<TagChip {tag_id} {table_id} />
