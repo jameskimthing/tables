@@ -14,7 +14,6 @@
 
 	(async () => {
 		isLoadingTableOverviews = true;
-		console.log('Loading start!');
 		if (!$tablesStore[table_id]) await loadTableOverviews();
 		isLoadingTableOverviews = false;
 

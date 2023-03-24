@@ -8,10 +8,9 @@ const supabase = createClient(
 	import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY
 );
 
-let user: UserResponse | undefined;
+let user: UserResponse;
 let prevAuthState: AuthChangeEvent | null = null;
 supabase.auth.onAuthStateChange(async (authState: AuthChangeEvent) => {
-	console.log('CHANGE! to: ' + authState);
 	if (prevAuthState === authState) return;
 	prevAuthState = authState;
 

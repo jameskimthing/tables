@@ -1,3 +1,4 @@
+import { alertUser } from '$lib/components/components/alert';
 import { showPopup, type PopupInfo } from '$lib/components/components/popup';
 import { getUser, supabase } from '$lib/supabase';
 import { get } from 'svelte/store';
@@ -40,6 +41,7 @@ async function addSingleTable() {
 					}
 				])
 				.select();
+			if (error) throw error;
 
 			tablesStore.update((table) => {
 				table[data![0]['id']] = {
@@ -52,6 +54,8 @@ async function addSingleTable() {
 				};
 				return table;
 			});
+
+			alertUser('success', 'Task completed', 'Successfully added table: ' + fields['name']);
 		}
 	});
 }
@@ -94,28 +98,10 @@ async function editSingleTable(
 
 				return table;
 			});
+
+			alertUser('success', 'Task completed', 'Successfully edited table: ' + fields['name']);
 		}
 	});
-
-	// const info: PopupInfo = {
-	// 	title: `Edit table: ${name}`,
-	// 	fields: {
-	// 		name: name,
-	// 		description: description
-	// 	},
-	// 	boolean: [
-	// 		{
-	// 			id: 'is_public',
-	// 			description: 'Make table public? (Public tables can be seen by anyone)',
-	// 			checked: is_public
-	// 		}
-	// 	],
-	// 	onFieldsSubmit: async () => {
-	// 		// @ts-ignore: Unreachable code error
-	// 		// console.log(this.title);
-	// 	}
-	// };
-	// showPopup(info);
 }
 
 async function deleteSingleTable(table_id: string, table_name: string) {
@@ -159,22 +145,24 @@ async function deleteSingleTable(table_id: string, table_name: string) {
 			while (tags_finished !== tags.length || folders_finished !== folders.length) {
 				await new Promise((res) => setTimeout(res, 100));
 			}
-			await supabase.from('Tables').delete().eq('id', table_id);
-			console.log('Deleted tables!');
+			// let a: PostgrestError;
+			const { data, error } = await supabase.from('Tables').delete().eq('id', table_id);
+			if (error) throw error;
 
 			// const deleteModTags = await supabase.from('Mod Tags').delete().eq
 
 			// const deleteTable = await supabase.from('Tables').delete().eq('id', table_id);
 			// if (deleteTable['error']) throw deleteTable['error'];
+
+			alertUser('success', 'Task completed', 'Successfully deleted table');
 		}
 	});
 }
 
 // Get the table info: Name, description, folders, tags (Just the overviews)
 async function loadTableOverviews() {
-	console.log('Loading tables!');
 	const user_id = (await getUser()).data.user?.id;
-	if (!user_id) throw 'Nope';
+	if (!user_id) throw { message: 'User not found', detail: 'user is undefined or null' };
 
 	// Get tables data
 	// const tableOverviews: SingleTable[] = [];
@@ -224,7 +212,6 @@ async function loadTableOverviews() {
 			}
 
 			tablesStore.update((table) => {
-				console.log('Updating table: add folders!');
 				Object.assign(table[table_id]['folders'], foldersToAdd);
 				return table;
 			});
@@ -261,7 +248,6 @@ async function loadTableOverviews() {
 			}
 
 			tablesStore.update((table) => {
-				console.log('Updating table: add tags!');
 				Object.assign(table[table_id]['tags'], tagsToAdd);
 				return table;
 			});
@@ -280,13 +266,14 @@ async function loadTableOverviews() {
 	while (foldersDone !== l || tagsDone !== l) {
 		await new Promise((res) => setTimeout(res, 100));
 	}
+
+	alertUser('success', 'Loading complete', 'Successfully loaded general table overviews');
+
 	return;
 	// tablesStore.set(tableOverviews);
 }
 
 async function loadSingleTable(table_id: string) {
-	console.log('--------------------------------------------------------------------------------');
-	console.log('Loading table: ' + table_id);
 	const folders = get(tablesStore)[table_id]['folders'];
 
 	let foldersDone: number = 0;
@@ -321,24 +308,16 @@ async function loadSingleTable(table_id: string) {
 	while (foldersDone !== foldersLength) {
 		await new Promise((res) => setTimeout(res, 50));
 	}
-	console.log('Loaded mods (folders): ');
-	console.log(get(tablesStore)[table_id]['folders']);
 
 	// Get the tags for each mod
 	const tags = Object.keys(get(tablesStore)[table_id]['tags']);
-	console.log('Tags in this table: ' + JSON.stringify(tags));
 	for (const tag_id of tags) {
 		(async () => {
 			const tagMods = await supabase.from('Mod Tags').select('mod_id').eq('tag_id', tag_id);
 			if (tagMods['error']) throw tagMods['error'];
 
 			// const tags: { [key: string]: SingleTag } = {};
-			console.log('  tagmods');
 			const modsToAssignTagsTo = tagMods['data'].map(({ mod_id }) => mod_id as string);
-			console.log(
-				'  current tag: ' + tag_id + ' - ' + JSON.stringify(get(tablesStore)[table_id]['tags'])
-			);
-			console.log('  mods on this tag: ' + JSON.stringify(modsToAssignTagsTo));
 
 			for (const mod_id of modsToAssignTagsTo) {
 				for (const folder_id of Object.keys(folders)) {
@@ -374,16 +353,11 @@ async function loadSingleTable(table_id: string) {
 		await new Promise((res) => setTimeout(res, 50));
 	}
 
-	console.log('Loaded tags: ');
-	console.log(get(tablesStore)[table_id]['folders']);
-
-	// Update
-	// tablesStore.update((prevTableStore) => {
-	// 	prevTableStore[table_id]['folders'] = folders;
-	// 	return prevTableStore;
-	// });
-
-	console.log('-------------Loaded table: ' + table_id);
+	alertUser(
+		'success',
+		'Loading complete',
+		'Successfully loaded single table: ' + get(tablesStore)[table_id]['name']
+	);
 }
 
 export { addSingleTable, editSingleTable, deleteSingleTable, loadTableOverviews, loadSingleTable };

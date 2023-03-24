@@ -3,7 +3,7 @@
 	import Checkbox from '$lib/components/form/Checkbox.svelte';
 	// import TagChipList from '$lib/components/chips/t.svelte';
 	import SvgButton from '$lib/components/SvgButton.svelte';
-	import { editSingleMod } from '$lib/tables/mods';
+	import { checkCheckbox, editSingleMod, unCheckCheckbox } from '$lib/tables/mods';
 	import { tablesStore, type SingleMod } from '$lib/tables/stores';
 
 	export let table_id: string;
@@ -33,6 +33,8 @@
 			info={{
 				checked: ($tablesStore[table_id]['folders'][folder_id]['mods'] ?? {})[mod_id]['completed']
 			}}
+			onClick={() => checkCheckbox(mod_id)}
+			onUnclick={() => unCheckCheckbox(mod_id)}
 		/>
 	</div>
 

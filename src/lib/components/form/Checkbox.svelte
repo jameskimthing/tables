@@ -14,7 +14,8 @@
 	let checked: boolean;
 	$: checked = info ? info['checked'] : false;
 
-	async function click() {
+	async function click(e: any) {
+		e.stopPropagation();
 		if (info) info['checked'] = !info['checked'];
 		else {
 			if (checked) {

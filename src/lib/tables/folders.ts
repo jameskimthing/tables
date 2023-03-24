@@ -1,3 +1,4 @@
+import { alertUser } from '$lib/components/components/alert';
 import { showPopup } from '$lib/components/components/popup';
 import { supabase } from '$lib/supabase';
 import { get } from 'svelte/store';
@@ -18,22 +19,18 @@ async function addSingleFolder(table_id: string) {
 				.from('Mod Folders')
 				.insert([{ ...fields, table: table_id }])
 				.select();
-			console.log(data);
 			if (error) throw error;
 
 			tablesStore.update((table) => {
 				table[table_id]['folders'][data![0]['id']] = fields;
 				return table;
 			});
-			console.log('Added single table folder');
+			alertUser('success', 'Task completed', 'Successfully added folder: ' + fields['name']);
 		}
 	});
 }
 
 async function editSingleFolder(folder_id: string, table_id: string) {
-	console.log('EDITING!');
-	console.log(folder_id);
-
 	const folder = get(tablesStore)[table_id]['folders'][folder_id];
 
 	const fields = {
@@ -55,14 +52,12 @@ async function editSingleFolder(folder_id: string, table_id: string) {
 
 				return table;
 			});
+			alertUser('success', 'Task completed', 'Successfully edited folder: ' + fields['name']);
 		}
 	});
 }
 
 async function deleteSingleFolder(folder_id: string, table_id: string) {
-	console.log('DELETING');
-	console.log(folder_id);
-
 	const folder = get(tablesStore)[table_id]['folders'][folder_id];
 
 	showPopup({
@@ -73,7 +68,8 @@ async function deleteSingleFolder(folder_id: string, table_id: string) {
 			let deleted_count: number = 0;
 			for (const mod of mods) {
 				(async () => {
-					await supabase.from('Mods').delete().eq('id', mod);
+					const { data, error } = await supabase.from('Mods').delete().eq('id', mod);
+					if (error) throw error;
 					deleted_count += 1;
 				})();
 			}
@@ -86,7 +82,10 @@ async function deleteSingleFolder(folder_id: string, table_id: string) {
 			while (deleted_count !== mods.length) {
 				await new Promise((res) => setTimeout(res, 100));
 			}
-			await supabase.from('Mod Folders').delete().eq('id', folder_id);
+			const { data, error } = await supabase.from('Mod Folders').delete().eq('id', folder_id);
+			if (error) throw error;
+
+			alertUser('success', 'Task completed', 'Successfully deleted folder');
 		}
 	});
 }

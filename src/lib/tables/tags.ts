@@ -1,3 +1,4 @@
+import { alertUser } from '$lib/components/components/alert';
 import { popup, showPopup } from '$lib/components/components/popup';
 import { supabase } from '$lib/supabase';
 import { get } from 'svelte/store';
@@ -58,6 +59,9 @@ async function addSingleTag(table_id: string, fields = { name: '', description: 
 	while (isLoading) {
 		await new Promise((res) => setTimeout(res, 100));
 	}
+
+	alertUser('success', 'Task complete', 'Successfully added single tag: ' + fields['name']);
+
 	return id!;
 }
 
@@ -83,6 +87,7 @@ async function editSingleTag(tag_id: string, table_id: string) {
 				table[table_id]['tags'][tag_id] = fields;
 				return table;
 			});
+			alertUser('success', 'Task complete', 'Successfully edited single tag: ' + fields['name']);
 		},
 		additionalOption: {
 			name: 'delete tag',
@@ -116,10 +121,6 @@ async function deleteSingleTag(tag_id: string, table_id: string) {
 			const mod_ids = modTagsData['data'].map(({ mod_id }) => mod_id as string);
 
 			tablesStore.update((table) => {
-				console.log(
-					'----- Deleting tag: ' + table_id + ' - ' + table[table_id]['tags'][tag_id]['name']
-				);
-
 				// Remove the references to that tag to delete
 				for (const mod_id of mod_ids) {
 					for (const [folder_id, folder] of Object.entries(table[table_id]['folders'])) {
@@ -131,16 +132,15 @@ async function deleteSingleTag(tag_id: string, table_id: string) {
 						folder['mods']![mod_id]['tags'] = folder['mods'][mod_id]['tags']?.filter(
 							(tag) => tag !== tag_id
 						);
-						console.log('Changed mods: ' + JSON.stringify(folder['mods'][mod_id]['tags']));
 					}
 				}
-				console.log('Delete tag in table');
 				delete table[table_id]['tags'][tag_id];
 
 				return table;
 			});
 
 			popup.set([]);
+			alertUser('success', 'Task completed', 'Successfully deleted single tag');
 		}
 	});
 }

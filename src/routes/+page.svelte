@@ -3,14 +3,9 @@
 	import { getUser } from '$lib/supabase';
 
 	(async () => {
-		// try {
 		const user = await getUser();
 		if (user) goto('/home');
 		else goto('/auth');
-		// } catch (err) {
-		// console.log(JSON.stringify(err));
-		// goto('/auth');
-		// }
 	})();
 </script>
 

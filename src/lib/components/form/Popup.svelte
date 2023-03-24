@@ -1,35 +1,10 @@
 <script lang="ts">
-	import type { SingleTag } from '$lib/tables/stores';
-	import { onMount } from 'svelte';
 	import Button from './Button.svelte';
 	import Checkbox from './Checkbox.svelte';
 	import { exitPopup, popup } from '../components/popup';
 	import Field from './Field.svelte';
 	import TagChoices from './TagChoices.svelte';
 
-	// async function submit() {
-	// 	// await new Promise((res) => setTimeout(res, 1000));
-	// 	if ($popup['onFieldsSubmit']) await $popup['onFieldsSubmit']();
-	// 	exitPopup();
-	// }
-
-	// let info: { [key: string]: string | boolean } = {};
-	// $: () => {
-	// 	if ($popup['fields']) info = $popup['fields'];
-	// 	console.log('FIELDS!');
-	// 	console.log($popup['fields']);
-	// };
-
-	// let tagInput: string;
-	// let chosenTags: { [key: string]: SingleTag } = {};
-	// $: console.log(tagInput);
-
-	// const table_id = $popup['table_id'];
-	// console.log('THE TABLE ID!');
-	// console.log(table_id);
-	// $: chosenTags = table_id ? filterThroughTags(tagInput, table_id!) : {};
-
-	// let count: number = 0
 	let isFirstField: boolean = true;
 	function checkIfFirstField() {
 		if (isFirstField) {

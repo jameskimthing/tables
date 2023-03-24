@@ -15,24 +15,8 @@
 	export let customTagsList: string[] = [];
 
 	let tagsList: string[] = setTagList($tablesStore[table_id]);
-	$: (tagsList = setTagList($tablesStore[table_id])),
-		console.log('--- TAGSLIST --- ' + JSON.stringify(tagsList));
+	$: tagsList = setTagList($tablesStore[table_id]);
 	function setTagList(table: SingleTable): string[] {
-		// console.log("Tags CHANGED!")
-		console.log('CHANGE IN THE TAGCHIP LIST------------------ ');
-		if (mod_id && folder_id) {
-			console.log('MOD ID AND FOLDER ID');
-			console.log('Mod: ' + JSON.stringify(table['folders'][folder_id]['mods']![mod_id]));
-			console.log(table['folders'][folder_id]['mods']![mod_id]['tags'] ?? []);
-		}
-		if (customTagsList.length !== 0) {
-			console.log('CUSTOM TAGS LIST');
-			console.log(customTagsList);
-		}
-		// return Object.keys(table['tags']);
-		console.log('OBJECTS?: ' + JSON.stringify(Object.keys(table['tags'])));
-		// console.log(Object.keys(table['tags']));
-
 		if (mod_id && folder_id) return table['folders'][folder_id]['mods']![mod_id]['tags'] ?? [];
 		if (customTagsList.length !== 0) return customTagsList;
 		return Object.keys(table['tags']);

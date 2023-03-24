@@ -1,4 +1,5 @@
-import { showPopup } from '$lib/components/components/popup';
+import { alertUser } from '$lib/components/components/alert';
+import { popup, showPopup } from '$lib/components/components/popup';
 import { supabase } from '$lib/supabase';
 import { get } from 'svelte/store';
 import { tablesStore } from './stores';
@@ -17,8 +18,8 @@ async function addSingleMod(folder_id: string, table_id: string) {
 		{
 			list: get(tablesStore)[table_id]['tags'],
 			choices: [],
-			description: 'Tags:',
-			choseNotPresent: () => console.log('That does not exist!')
+			description: 'Tags:'
+			// choseNotPresent: () => consoe.log('That does not exist!')
 		}
 	];
 
@@ -39,8 +40,6 @@ async function addSingleMod(folder_id: string, table_id: string) {
 		chooseFrom: choiceFields,
 		table_id: table_id,
 		onFieldsSubmit: async () => {
-			console.log('SUBMIT!');
-
 			// Insert mods
 			const modsData = await supabase
 				.from('Mods')
@@ -76,6 +75,8 @@ async function addSingleMod(folder_id: string, table_id: string) {
 
 				return table;
 			});
+
+			alertUser('success', 'Task completed', 'Successfully added item: ' + fields['name']);
 		}
 	});
 }
@@ -94,8 +95,8 @@ async function editSingleMod(mod_id: string, folder_id: string, table_id: string
 		{
 			list: get(tablesStore)[table_id]['tags'],
 			choices: mod['tags'] ?? [],
-			description: 'Tags:',
-			choseNotPresent: () => console.log('That does not exist!')
+			description: 'Tags:'
+			// choseNotPresent: () => consoe.log('That does not exist!')
 		}
 	];
 
@@ -115,8 +116,6 @@ async function editSingleMod(mod_id: string, folder_id: string, table_id: string
 		chooseFrom: choiceFields,
 		table_id: table_id,
 		onFieldsSubmit: async () => {
-			console.log('SUBMIT!');
-
 			// Insert mods
 			// const modsData = await supabase
 			// 	.from('Mods')
@@ -151,11 +150,6 @@ async function editSingleMod(mod_id: string, folder_id: string, table_id: string
 			// const tagsToDelete = tagsSelected.filter((tag_id) => preExistingTags.includes(tag_id));
 			const tagsToDelete = preExistingTags.filter((tag_id) => !tagsSelected.includes(tag_id));
 			const tagsToAdd = tagsSelected.filter((tag_id) => !preExistingTags.includes(tag_id));
-
-			console.log('TAGS SELECTED: ' + JSON.stringify(tagsSelected));
-			console.log('Pre-existing tags: ' + JSON.stringify(preExistingTags));
-			console.log('Tags to delete: ' + JSON.stringify(tagsToDelete));
-			console.log('Tags to add: ' + JSON.stringify(tagsToAdd));
 
 			for (const tag_id of tagsToDelete) {
 				(async () => {
@@ -194,11 +188,11 @@ async function editSingleMod(mod_id: string, folder_id: string, table_id: string
 					created_at: modsData['data'][0]['created_at'],
 					tags: tagsSelected
 				};
-				console.log('Tags of this mod: ');
-				console.log(table[table_id]['folders'][folder_id]['mods']![mod_id]['tags']);
 
 				return table;
 			});
+
+			alertUser('success', 'Task completed', 'Successfully edited item: ' + fields['name']);
 		},
 		additionalOption: {
 			name: 'delete item',
@@ -208,7 +202,6 @@ async function editSingleMod(mod_id: string, folder_id: string, table_id: string
 }
 
 async function deleteSingleMod(mod_id: string, folder_id: string, table_id: string) {
-	console.log('Deleting single MOD: ' + mod_id);
 	const mod = get(tablesStore)[table_id]['folders'][folder_id]['mods']![mod_id];
 
 	showPopup({
@@ -217,15 +210,27 @@ async function deleteSingleMod(mod_id: string, folder_id: string, table_id: stri
 		submitIsDangerous: true,
 		onFieldsSubmit: async () => {
 			const { data, error } = await supabase.from('Mods').delete().eq('id', mod_id);
-			console.log(error);
 			if (error) throw error;
 
 			tablesStore.update((table) => {
 				delete table[table_id]['folders'][folder_id]['mods']![mod_id];
 				return table;
 			});
+			popup.set([]);
+
+			alertUser('success', 'Task completed', 'Successfully deleted item');
 		}
 	});
 }
 
-export { addSingleMod, editSingleMod, deleteSingleMod };
+async function checkCheckbox(mod_id: string) {
+	const { data, error } = await supabase.from('Mods').update({ completed: true }).eq('id', mod_id);
+	if (error) throw error;
+}
+
+async function unCheckCheckbox(mod_id: string) {
+	const { data, error } = await supabase.from('Mods').update({ completed: false }).eq('id', mod_id);
+	if (error) throw error;
+}
+
+export { addSingleMod, editSingleMod, deleteSingleMod, checkCheckbox, unCheckCheckbox };

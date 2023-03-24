@@ -1,3 +1,4 @@
+import { alertUser } from '$lib/components/components/alert';
 import { supabase } from '$lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
@@ -8,6 +9,8 @@ async function signin(info: { email: string; password: string }): Promise<User> 
 	});
 
 	if (error) throw error;
+
+	alertUser('success', 'Successfully signed in!', data['user']!['email']!);
 	return data['user']!;
 }
 async function signup(info: { email: string; password: string; name: string }): Promise<User> {

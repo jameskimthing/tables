@@ -43,13 +43,16 @@ function alertUser(type: alertType, title: string, body: string) {
 	});
 
 	(async () => {
-		await new Promise((res) => setTimeout(res, 6000));
+		let time: number = 1000;
+		if (type === 'error') time = 4000;
+
+		await new Promise((res) => setTimeout(res, time));
 		alerts.update((prevAlerts) => {
 			delete prevAlerts[id];
 			return prevAlerts;
 		});
 	})();
-	console.log('?here');
 }
 
 export { alerts, alertUser };
+export type { alertType };
