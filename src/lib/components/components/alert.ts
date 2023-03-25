@@ -45,6 +45,7 @@ function alertUser(type: alertType, title: string, body: string) {
 	(async () => {
 		let time: number = 1000;
 		if (type === 'error') time = 4000;
+		if (type === 'info') time = 8000;
 
 		await new Promise((res) => setTimeout(res, time));
 		alerts.update((prevAlerts) => {
