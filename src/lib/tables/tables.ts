@@ -169,7 +169,10 @@ async function loadTableOverviews() {
 	// const tableOverviews: { [key: string]: SingleTable } = {};
 	const tableOverviewsData = await supabase
 		.from('Tables')
-		.select('id,name,description,is_public,made_by');
+		.select('id,name,description,is_public,made_by')
+		.or(`is_public.eq.${true},made_by.eq.${user_id}`);
+	// .eq('table', table_id);
+
 	if (tableOverviewsData['error']) throw tableOverviewsData['error'];
 
 	const tablesData: { [key: string]: SingleTable } = {};

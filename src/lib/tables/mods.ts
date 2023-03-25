@@ -47,6 +47,7 @@ async function addSingleMod(folder_id: string, table_id: string) {
 					{
 						...fields,
 						folder: folder_id,
+						table: table_id,
 						completed: booleanFields[0]['checked']
 					}
 				])
@@ -55,9 +56,9 @@ async function addSingleMod(folder_id: string, table_id: string) {
 
 			const mod_id: string = modsData['data']![0]['id'];
 
-			const tags_to_add: { mod_id: string; tag_id: string }[] = [];
+			const tags_to_add: { mod_id: string; tag_id: string; table: string }[] = [];
 			for (const tag of choiceFields[0]['choices']) {
-				tags_to_add.push({ mod_id: mod_id, tag_id: tag });
+				tags_to_add.push({ mod_id: mod_id, tag_id: tag, table: table_id });
 			}
 
 			const modTagsData = await supabase.from('Mod Tags').insert(tags_to_add);
@@ -132,6 +133,7 @@ async function editSingleMod(mod_id: string, folder_id: string, table_id: string
 				.update({
 					...fields,
 					folder: folder_id,
+					table: table_id,
 					completed: booleanFields[0]['checked']
 				})
 				.eq('id', mod_id)
@@ -167,7 +169,8 @@ async function editSingleMod(mod_id: string, folder_id: string, table_id: string
 					// const tag = get(tablesStore)[table_id]['tags'][tag_id];
 					const tagAdded = await supabase.from('Mod Tags').insert({
 						tag_id: tag_id,
-						mod_id: mod_id
+						mod_id: mod_id,
+						table: table_id
 					});
 					if (tagAdded['error']) throw tagAdded['error'];
 				})();

@@ -1,5 +1,5 @@
 import { alertUser } from '$lib/components/components/alert';
-import { showPopup } from '$lib/components/components/popup';
+import { popup, showPopup } from '$lib/components/components/popup';
 import { supabase } from '$lib/supabase';
 import { get } from 'svelte/store';
 import { tablesStore } from './stores';
@@ -53,6 +53,10 @@ async function editSingleFolder(folder_id: string, table_id: string) {
 				return table;
 			});
 			alertUser('success', 'Task completed', 'Successfully edited folder: ' + fields['name']);
+		},
+		additionalOption: {
+			name: 'delete folder',
+			onSubmit: async () => await deleteSingleFolder(folder_id, table_id)
 		}
 	});
 }
@@ -85,6 +89,7 @@ async function deleteSingleFolder(folder_id: string, table_id: string) {
 			const { data, error } = await supabase.from('Mod Folders').delete().eq('id', folder_id);
 			if (error) throw error;
 
+			popup.set([]);
 			alertUser('success', 'Task completed', 'Successfully deleted folder');
 		}
 	});

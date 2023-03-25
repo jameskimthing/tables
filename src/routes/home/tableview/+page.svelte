@@ -20,6 +20,7 @@
 		// const folders = $tablesStore[table_id]['folders'];
 
 		const firstId: string = Object.keys($tablesStore[table_id]['folders'])[0];
+		if (!firstId) return;
 		const isLoaded: boolean = !!$tablesStore[table_id]['folders'][firstId]['mods'];
 		if (!isLoaded) await loadSingleTable(table_id);
 	})();
