@@ -6,26 +6,26 @@
 	// export let info: any = null;
 	// export let info: { checked: boolean } = { checked: false };
 	export let info: { checked: boolean };
+	export let onToggle: Function = () => {};
 
 	// Use as a standalone checkbox
-	export let onClick: Function = () => {};
-	export let onUnclick: Function = () => {};
+	// export let onClick: Function () => {};
+	// export let onUnclick: Function () => {};
 
 	let checked: boolean;
 	$: checked = info ? info['checked'] : false;
 
 	async function click(e: any) {
 		e.stopPropagation();
-		if (info) info['checked'] = !info['checked'];
-		else {
-			if (checked) {
-				checked = false;
-				await onClick();
-			} else {
-				checked = true;
-				await onUnclick();
-			}
-		}
+		info['checked'] = !info['checked'];
+		checked = info['checked'];
+		await onToggle();
+		// else {
+		// 	if (checked) await onClick!();
+		// 	else await onUnclick!();
+		// }
+		// if (checked) checked = false;
+		// else checked = true;
 	}
 </script>
 

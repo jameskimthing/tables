@@ -10,10 +10,10 @@
 	const table_id = $page.url.searchParams.get('id');
 	if (!table_id) throw 'NO ID?';
 
-	let isLoadingTableOverviews: boolean = false;
+	let isLoadingTableOverviews: boolean = true;
+	let isLoadingTableData: boolean = true;
 
 	(async () => {
-		isLoadingTableOverviews = true;
 		if (!$tablesStore[table_id]) await loadTableOverviews();
 		isLoadingTableOverviews = false;
 
@@ -23,6 +23,7 @@
 		if (!firstId) return;
 		const isLoaded: boolean = !!$tablesStore[table_id]['folders'][firstId]['mods'];
 		if (!isLoaded) await loadSingleTable(table_id);
+		isLoadingTableData = false;
 	})();
 </script>
 
@@ -55,7 +56,7 @@
 	</div>
 </div>
 
-{#if !isLoadingTableOverviews}
+{#if !isLoadingTableData}
 	{#each Object.entries($tablesStore[table_id]['folders']) as [folder_id, folder] (folder_id)}
 		<SingleFolderView {table_id} {folder_id} />
 	{/each}

@@ -10,7 +10,26 @@
 	export let folder_id: string;
 	export let table_id: string;
 	let folder: SingleFolder;
-	$: folder = $tablesStore[table_id]['folders'][folder_id];
+	$: (folder = $tablesStore[table_id]['folders'][folder_id]), setMods();
+
+	let notCompletedMods: string[] = [];
+	let completedMods: string[] = [];
+
+	// let first: boolean = true;
+
+	function setMods() {
+		// if (first) return (first = false);
+
+		notCompletedMods = [];
+		completedMods = [];
+
+		for (const [mod_id, mod] of Object.entries(folder['mods'] ?? {})) {
+			if (mod['completed']) completedMods.push(mod_id);
+			else notCompletedMods.push(mod_id);
+		}
+	}
+
+	let showCompleted: boolean = false;
 </script>
 
 <div class="p-2 my-2 border-4 border-black rounded">
@@ -24,37 +43,30 @@
 				<Tooltip is="Edit folder" />
 			</div>
 		</div>
-		<!-- <div class="text-3xl">{folder['name']}</div> -->
-		<!-- <div class="flex flex-row">
-			<SvgButton
-				type="plus"
-				is="Add a new item"
-				click={() => addSingleMod(folder_id, table_id)}
-				direction="left"
-			/>
-			<SvgButton
-				type="edit"
-				is="Edit Folder"
-				click={() => editSingleFolder(folder_id, table_id)}
-				direction="left"
-			/>
-			<SvgButton
-				type="delete"
-				is="Delete Folder"
-				click={() => deleteSingleFolder(folder_id, table_id)}
-				direction="left"
-			/>
-		</div> -->
 	</div>
 	<div class="text-gray-700">
 		{folder['description']}
 	</div>
 	{#if folder['mods']}
-		{#each Object.entries(folder['mods'] ?? {}) as [mod_id, mod] (mod_id)}
-			<!-- <div class="my-4 mx-2"> -->
+		<!-- {#each Object.entries(folder['mods'] ?? {}) as [mod_id, mod] (mod_id)} -->
+		{#each notCompletedMods as mod_id (mod_id)}
 			<SingleModView {mod_id} {table_id} {folder_id} />
-			<!-- </div> -->
 		{/each}
+		<!-- <div class="w-full h-1 bg-black" /> -->
+		<div
+			class="mx-auto w-fit text-lg italic py-1 px-2 rounded border-2 border-black hover:bg-slate-300 cursor-pointer select-none"
+			on:pointerup={() => (showCompleted = !showCompleted)}
+		>
+			Show completed items?
+		</div>
+		{#if showCompleted}
+			<div class="bg-slate-200 rounded-lg p-4 m-2">
+				{#each completedMods as mod_id (mod_id)}
+					<SingleModView {mod_id} {table_id} {folder_id} />
+				{/each}
+			</div>
+		{/if}
+		<!-- {/each} -->
 	{/if}
 
 	<div

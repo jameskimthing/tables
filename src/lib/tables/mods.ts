@@ -226,14 +226,14 @@ async function deleteSingleMod(mod_id: string, folder_id: string, table_id: stri
 	});
 }
 
-async function checkCheckbox(mod_id: string) {
-	const { data, error } = await supabase.from('Mods').update({ completed: true }).eq('id', mod_id);
+async function toggleCheckbox(mod_id: string, completed: boolean) {
+	const { error } = await supabase.from('Mods').update({ completed: completed }).eq('id', mod_id);
 	if (error) throw error;
 }
 
-async function unCheckCheckbox(mod_id: string) {
-	const { data, error } = await supabase.from('Mods').update({ completed: false }).eq('id', mod_id);
-	if (error) throw error;
-}
+// async function unCheckCheckbox(mod_id: string) {
+// 	const { data, error } = await supabase.from('Mods').update({ completed: false }).eq('id', mod_id);
+// 	if (error) throw error;
+// }
 
-export { addSingleMod, editSingleMod, deleteSingleMod, checkCheckbox, unCheckCheckbox };
+export { addSingleMod, editSingleMod, deleteSingleMod, toggleCheckbox };

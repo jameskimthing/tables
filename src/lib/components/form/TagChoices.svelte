@@ -126,7 +126,7 @@
 			<div class="p-1">
 				<div class="flex flex-row w-fit items-center">
 					<div
-						class="scale-90 px-1 rounded border-2 cursor-pointer hover:border-black hover:bg-gray-400 select-none"
+						class="scale-90 px-1 rounded border-2 cursor-pointer border-transparent hover:border-black hover:bg-gray-400 select-none"
 						on:pointerup={() => {
 							// const clone = JSON.parse(JSON.stringify(selectedTags))
 							const clone = selectedTags;
